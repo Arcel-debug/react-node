@@ -1,0 +1,55 @@
+services:
+  # The MySQL database service
+  db:
+    image: mysql@sha256:9a6e00e4043c02e67565eeb1cae1ada064adea1bcaf7c329ec960087c4fc8777
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Arcelbularon7.
+      MYSQL_DATABASE: react_node
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: Arcelbularon7.
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # The phpMyAdmin service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: Arcelbularon7.
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+
+volumes:
+  db_data:
